@@ -1,0 +1,55 @@
+commit d446b130b83aa8cfed452fc12473664255b9a883
+Author: Your Name <you@example.com>
+Date:   Mon Sep 4 17:41:45 2017 +0800
+
+    add callback to JAVA layer
+    compile:mmm ./frameworks/base/services/java/
+
+diff --git a/frameworks/base/services/java/com/android/server/Led_demo_Service.java b/frameworks/base/services/java/com/android/server/Led_demo_Service.java
+index 3d7a0a3..0656b46 100755
+--- a/frameworks/base/services/java/com/android/server/Led_demo_Service.java
++++ b/frameworks/base/services/java/com/android/server/Led_demo_Service.java
+@@ -1,12 +1,17 @@
+ package com.android.server;
++
+ import android.content.Context;
+ import android.os.ILed_demo_service;
+ import android.util.Slog;
++
++import android.os.RemoteCallbackList;
++import android.os.ICallback;
+ import android.os.RemoteException;
+ 
+ public class Led_demo_Service extends ILed_demo_service.Stub
+ {
+ 	private static final String TAG = "Led_demo_Service";
++	private RemoteCallbackList<ICallback> mCallbacks = new RemoteCallbackList<ICallback>(); 
+ 	private int mPtr = 0;
+ 
+ 	Led_demo_Service()
+@@ -45,5 +50,25 @@ public class Led_demo_Service extends ILed_demo_service.Stub
+ 	public native int init_native();
+ 	public native void set_OFF_native(int mPtr, int val);
+ 	public native void set_ON_native(int mPtr, int val);
++	 
++	public void unregisterCallback(ICallback cb){  
++		if(cb != null) mCallbacks.unregister(cb);  
++	}  
++ 
++	public void registerCallback(ICallback cb){  
++		if(cb != null)   mCallbacks.register(cb);
++	} 
++	
++	public void cb_output(String out){
++		int N = mCallbacks.beginBroadcast(); 
++		Slog.i(TAG, "mCallbacks.beginBroadcast() is " + N);
++		try {  
++			for (int i = 0; i < N; i++)  
++				mCallbacks.getBroadcastItem(i).showResult(out); 
++		} catch (RemoteException e) {  
++			Slog.e(TAG, "cb_output RemoteException", e);  
++		} 
++		mCallbacks.finishBroadcast();
++	}
+ };
+ 

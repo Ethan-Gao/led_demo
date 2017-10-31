@@ -1,0 +1,10 @@
+--- frameworks/base/services/jni/Android.mk	2017-07-13 13:39:19.383054103 +0800
++++ frameworks/base/services/jni/Android.mk.orig	2017-06-02 14:27:34.000000000 +0800
+@@ -15,6 +15,7 @@
+     com_android_server_VibratorService.cpp \
+     com_android_server_location_GpsLocationProvider.cpp \
+     com_android_server_connectivity_Vpn.cpp \
++	com_android_server_led_demo_service.cpp \
+     onload.cpp
+ 
+ LOCAL_C_INCLUDES += \

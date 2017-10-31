@@ -1,0 +1,80 @@
+commit 9bab380cdc2d05887b3c4b6935aeca40fd51bf99
+Author: Your Name <you@example.com>
+Date:   Tue Aug 29 15:29:53 2017 +0800
+
+    add JAVA layer code
+    compile:mmm ./frameworks/base/services/java/
+
+diff --git a/frameworks/base/services/java/com/android/server/Led_demo_Service.java b/frameworks/base/services/java/com/android/server/Led_demo_Service.java
+new file mode 100755
+index 0000000..3d7a0a3
+--- /dev/null
++++ b/frameworks/base/services/java/com/android/server/Led_demo_Service.java
+@@ -0,0 +1,49 @@
++package com.android.server;
++import android.content.Context;
++import android.os.ILed_demo_service;
++import android.util.Slog;
++import android.os.RemoteException;
++
++public class Led_demo_Service extends ILed_demo_service.Stub
++{
++	private static final String TAG = "Led_demo_Service";
++	private int mPtr = 0;
++
++	Led_demo_Service()
++	{
++		mPtr = init_native();
++
++		if(mPtr == 0)
++		{
++			Slog.e(TAG, "Failed to initialize Led demo Service.");
++		}
++	}
++
++	public void led_set_ON(int val)
++	{
++		if(mPtr == 0)
++		{
++			Slog.e(TAG, "Led demo Service is not initialized.");
++			return;
++		}
++
++		set_ON_native(mPtr, val);
++	}
++
++	public void led_set_OFF(int val)
++	{
++		if(mPtr == 0)
++		{
++			Slog.e(TAG, "Led demo Service is not initialized.");
++			return;
++		}
++
++		set_OFF_native(mPtr, val);
++	}
++
++
++	public native int init_native();
++	public native void set_OFF_native(int mPtr, int val);
++	public native void set_ON_native(int mPtr, int val);
++};
++
+diff --git a/frameworks/base/services/java/com/android/server/SystemServer.java b/frameworks/base/services/java/com/android/server/SystemServer.java
+index cf52712..91984d3 100755
+--- a/frameworks/base/services/java/com/android/server/SystemServer.java
++++ b/frameworks/base/services/java/com/android/server/SystemServer.java
+@@ -279,6 +279,13 @@ class ServerThread extends Thread {
+             }
+         }
+ 		
++	    try{
++		    Slog.i(TAG, "Led demo Service");
++		    ServiceManager.addService("led_demo", new Led_demo_Service());
++	    } catch (Throwable e) {
++			Slog.e(TAG, "Failed to start Led demo Service", e);
++	    }
++		
+         try {
+             wm.displayReady();
+         } catch (Throwable e) {

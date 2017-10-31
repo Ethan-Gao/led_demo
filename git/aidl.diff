@@ -1,0 +1,32 @@
+commit 4f43c86bc3586b7b790b251483b45e458dd82b33
+Author: Your Name <you@example.com>
+Date:   Tue Aug 29 15:36:18 2017 +0800
+
+    add AIDL interface
+    compile:mmm ./frameworks/base/
+
+diff --git a/frameworks/base/Android.mk b/frameworks/base/Android.mk
+index 77ff8b5..f49ad38 100755
+--- a/frameworks/base/Android.mk
++++ b/frameworks/base/Android.mk
+@@ -127,6 +127,7 @@ LOCAL_SRC_FILES += \
+ 	core/java/android/os/IPowerManager.aidl \
+ 	core/java/android/os/IRemoteCallback.aidl \
+ 	core/java/android/os/IVibratorService.aidl \
++	core/java/android/os/ILed_demo_service.aidl \
+ 	core/java/android/service/wallpaper/IWallpaperConnection.aidl \
+ 	core/java/android/service/wallpaper/IWallpaperEngine.aidl \
+ 	core/java/android/service/wallpaper/IWallpaperService.aidl \
+diff --git a/frameworks/base/core/java/android/os/ILed_demo_service.aidl b/frameworks/base/core/java/android/os/ILed_demo_service.aidl
+new file mode 100755
+index 0000000..633b6a8
+--- /dev/null
++++ b/frameworks/base/core/java/android/os/ILed_demo_service.aidl
+@@ -0,0 +1,7 @@
++package android.os;
++
++interface ILed_demo_service
++{
++    void led_set_ON(int val);
++    void led_set_OFF(int val);
++}

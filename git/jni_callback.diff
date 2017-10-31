@@ -1,0 +1,53 @@
+commit 8b4d5f027360722c480ee453ce211b6faf273556
+Author: Your Name <you@example.com>
+Date:   Mon Sep 4 17:45:39 2017 +0800
+
+    add callback to JNI layer
+    compile:mmm ./frameworks/base/services/jni/
+
+diff --git a/frameworks/base/services/jni/com_android_server_led_demo_service.cpp b/frameworks/base/services/jni/com_android_server_led_demo_service.cpp
+index 39e4af5..1790c4a 100755
+--- a/frameworks/base/services/jni/com_android_server_led_demo_service.cpp
++++ b/frameworks/base/services/jni/com_android_server_led_demo_service.cpp
+@@ -14,6 +14,24 @@
+ 
+ namespace android
+ {
++    static void cb_test(JNIEnv *env, jobject obj,jstring info){
++        LOGI("executing cb_test...");   
++        jclass cls = env->FindClass("com/android/server/Led_demo_Service");
++        if(cls == NULL) {
++            LOGE("can't find com/android/server/Led_demo_Service");
++            return;
++        }
++        (jclass) env->NewGlobalRef(cls);
++        jmethodID jmid = env->GetMethodID(cls, "cb_output", "(Ljava/lang/String;)V");
++        if(jmid == NULL){
++            LOGE("no cb_output in Led_demo_Service class");
++            return;
++        }
++        //jstring info = env->NewStringUTF(out);
++        env->CallVoidMethod(obj,jmid,info);
++        env->ReleaseStringUTFChars(info,env->GetStringUTFChars(info, 0));      
++    }
++
+ 	static void led_demo_setOFF(JNIEnv *env, jobject clazz, jint ptr, jint value)
+ 	{
+ 		led_demo_device_t *device = (led_demo_device_t *)ptr;
+@@ -26,6 +44,8 @@ namespace android
+ 		int val = value;
+ 
+ 		LOGI("Set value %d to device led demo.", val);
++//cb_test(env,clazz,"Led Is Off");	env->NewStringUTF(out);
++		cb_test(env,clazz,env->NewStringUTF("Led Is Off"));
+ 		device->set_off(device, value);
+ 	}
+ 
+@@ -41,6 +61,7 @@ namespace android
+ 		int val = value;
+ 
+ 		LOGI("Set value %d to device led demo.", val);
++cb_test(env,clazz,env->NewStringUTF("Led Is On"));
+ 		device->set_on(device, value);
+ 	}
+ 	

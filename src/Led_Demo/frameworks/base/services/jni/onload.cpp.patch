@@ -1,0 +1,18 @@
+--- frameworks/base/services/jni/onload.cpp	2017-07-13 13:36:22.335551160 +0800
++++ frameworks/base/services/jni/onload.cpp.orig	2017-06-02 14:26:58.000000000 +0800
+@@ -33,6 +33,7 @@
+ int register_android_server_SystemServer(JNIEnv* env);
+ int register_android_server_location_GpsLocationProvider(JNIEnv* env);
+ int register_android_server_connectivity_Vpn(JNIEnv* env);
++int register_android_server_led_demo_service(JNIEnv *env);
+ };
+ 
+ using namespace android;
+@@ -61,6 +62,7 @@
+     register_android_server_SystemServer(env);
+     register_android_server_location_GpsLocationProvider(env);
+     register_android_server_connectivity_Vpn(env);
++	register_android_server_led_demo_service(env);
+ 
+     return JNI_VERSION_1_4;
+ }

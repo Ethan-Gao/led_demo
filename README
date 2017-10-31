@@ -1,0 +1,7 @@
+doc		整个Led_Demo操作文档、问题说明、原理说明
+git		针对git方式管理源码的修改补丁
+src		源码(其中已存在文件已patch方式给出，便于查看修改点)
+
+说明:
+1.此Led_Demo理论上可以运行在所有android平台，但由于不同版本android源码不同，因此修改位置会有所不同，若版本为TI-Android-ICS-4.0.3-DevKit-EVM-SK-3.0.1可以直接使用，若是其他版本，需要手动修改.
+2.详细分析参见Led_Demo使用文档.xps

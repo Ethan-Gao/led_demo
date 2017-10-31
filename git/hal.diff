@@ -1,0 +1,190 @@
+commit 5aa1346b94c1657549785021c41108893a89ede1
+Author: Your Name <you@example.com>
+Date:   Tue Aug 29 15:04:36 2017 +0800
+
+    add HAL layer code
+    compile:mmm ./hardware/libhardware/modules/led_demo_hal/
+
+diff --git a/hardware/libhardware/include/hardware/led_demo_hal.h b/hardware/libhardware/include/hardware/led_demo_hal.h
+new file mode 100755
+index 0000000..f0d3245
+--- /dev/null
++++ b/hardware/libhardware/include/hardware/led_demo_hal.h
+@@ -0,0 +1,28 @@
++#ifndef ANDROID_LED_DEMO_HAL_H
++#define ANDROID_LED_DEMO_HAL_H
++
++#include <hardware/hardware.h>
++
++__BEGIN_DECLS
++
++#define LED_DEMO_HARDWARE_MODULE_ID   "led_demo_hal"
++#define LED_DEMO_HARDWARE_DEVICE_ID   "led_demo"
++
++
++struct led_demo_module_t
++{
++	struct hw_module_t common;
++};
++
++struct led_demo_device_t
++{
++	struct hw_device_t common;
++	int fd;
++	int (*set_on)(struct led_demo_device_t *dev, int val);
++	int (*set_off)(struct led_demo_device_t *dev, int val);
++};
++
++__END_DECLS
++
++
++#endif
+diff --git a/hardware/libhardware/modules/led_demo_hal/Android.mk b/hardware/libhardware/modules/led_demo_hal/Android.mk
+new file mode 100755
+index 0000000..b820aeb
+--- /dev/null
++++ b/hardware/libhardware/modules/led_demo_hal/Android.mk
+@@ -0,0 +1,10 @@
++LOCAL_PATH := $(call my-dir)
++include $(CLEAR_VARS)
++LOCAL_MODULE_TAGS := optional
++LOCAL_PRELINK_MODULE := false
++LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
++LOCAL_SHARED_LIBRARIES := liblog
++LOCAL_SRC_FILES := led_demo_hal.cpp
++LOCAL_MODULE := led_demo_hal.default
++include $(BUILD_SHARED_LIBRARY)
++
+diff --git a/hardware/libhardware/modules/led_demo_hal/led_demo_hal.cpp b/hardware/libhardware/modules/led_demo_hal/led_demo_hal.cpp
+new file mode 100755
+index 0000000..a8dc59b
+--- /dev/null
++++ b/hardware/libhardware/modules/led_demo_hal/led_demo_hal.cpp
+@@ -0,0 +1,127 @@
++#define LOG_TAG "LED_DEMO_HALSTUB"
++
++#include <hardware/hardware.h>
++#include <hardware/led_demo_hal.h>
++
++#include <fcntl.h>
++#include <errno.h>
++
++#include <utils/Log.h>
++#include <cutils/atomic.h>
++#include <stdlib.h>
++
++#define DEVICE_NAME    "/sys/class/leds/user_led/brightness"
++#define MODULE_NAME    "led_demo"
++#define MODULE_AUTHOR  "pengdonglin137@163.com"
++
++#define LED_ON  0x40044c00
++#define LED_OFF 0x40044c01
++
++
++static int led_demo_open(const struct hw_module_t* module, const char* id,
++		struct hw_device_t** device);
++
++static int led_demo_close(struct hw_device_t* device);
++
++static int led_demo_set_on(struct led_demo_device_t *dev, int val);
++
++static int led_demo_set_off(struct led_demo_device_t *dev, int val);
++
++
++static hw_module_methods_t led_demo_module_methods =
++{
++	open:led_demo_open,
++};
++
++struct led_demo_module_t HAL_MODULE_INFO_SYM = 
++{
++	common:{
++		tag:HARDWARE_MODULE_TAG,
++		version_major:1,
++		version_minor:0,
++		id:LED_DEMO_HARDWARE_MODULE_ID,
++		name:MODULE_NAME,
++		author:MODULE_AUTHOR,
++		methods:&led_demo_module_methods,
++	}
++};
++
++static int led_demo_open(const struct hw_module_t* module, const char* id,
++		struct hw_device_t** device)
++{
++	if(!strcmp(id, LED_DEMO_HARDWARE_DEVICE_ID))
++	{
++		struct led_demo_device_t *dev;
++
++		dev = (struct led_demo_device_t *)malloc(sizeof(struct led_demo_device_t));
++		if(!dev)
++		{
++			LOGE("Failed to alloc space for struct led_demo_device_t.");
++			return -EFAULT;
++		}
++
++		memset(dev, 0, sizeof(struct led_demo_device_t));
++
++		dev->common.tag = HARDWARE_DEVICE_TAG;
++		dev->common.version = 0;
++		dev->common.module = (struct hw_module_t *)module;
++		dev->common.close = led_demo_close;
++		dev->set_on = led_demo_set_on;
++		dev->set_off = led_demo_set_off;
++
++		if((dev->fd = open(DEVICE_NAME, O_RDWR)) == -1)
++		{
++			LOGE("Failed to open device %s ---- %s\n.", DEVICE_NAME, strerror(errno));
++			free(dev);
++			return -EFAULT;
++		}
++
++		*device = &(dev->common);
++
++		LOGE("Open device file %s successfully.", DEVICE_NAME);
++
++	}
++
++	return -EFAULT;
++}
++
++static int led_demo_close(struct hw_device_t* device)
++{
++	struct led_demo_device_t *led_device = (struct led_demo_device_t *)device;
++	if(led_device)
++	{
++		close(led_device->fd);
++		free(led_device);
++	}
++
++	return 0;
++}
++
++static int led_demo_set_on(struct led_demo_device_t *dev, int val)
++{
++	if(!dev)
++	{
++		LOGE("Null dev pointer.");
++		return -EFAULT;
++	}
++	
++	system("echo 1 > /sys/class/leds/user_led/brightness");
++	
++	return 0;
++	
++}
++
++static int led_demo_set_off(struct led_demo_device_t *dev, int val)
++{
++	if(!dev)
++	{
++		LOGE("Null dev pointer.");
++		return -EFAULT;
++	}
++	
++	system("echo 0 > /sys/class/leds/user_led/brightness");
++ 
++	return 0;
++	
++}
++

@@ -1,0 +1,16 @@
+--- frameworks/base/services/java/com/android/server/SystemServer.java	2017-07-13 13:43:55.549713841 +0800
++++ frameworks/base/services/java/com/android/server/SystemServer.java.orig	2017-06-02 14:30:03.000000000 +0800
+@@ -279,6 +279,13 @@
+             }
+         }
+		
++	    try{
++		    Slog.i(TAG, "Led demo Service");
++		    ServiceManager.addService("led_demo", new Led_demo_Service());
++	    } catch (Throwable e) {
++			Slog.e(TAG, "Failed to start Led demo Service", e);
++	    }
++		
+         try {
+             wm.displayReady();
+         } catch (Throwable e) {

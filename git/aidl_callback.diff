@@ -1,0 +1,47 @@
+commit ff3b40cbece9e98f3d8aec72f83f10455e266e1a
+Author: Your Name <you@example.com>
+Date:   Mon Sep 4 16:35:13 2017 +0800
+
+    add callback to AIDL interface
+    compile:mmm ./frameworks/base/
+
+diff --git a/frameworks/base/Android.mk b/frameworks/base/Android.mk
+index f49ad38..4ddcbd2 100755
+--- a/frameworks/base/Android.mk
++++ b/frameworks/base/Android.mk
+@@ -128,6 +128,7 @@ LOCAL_SRC_FILES += \
+ 	core/java/android/os/IRemoteCallback.aidl \
+ 	core/java/android/os/IVibratorService.aidl \
+ 	core/java/android/os/ILed_demo_service.aidl \
++	core/java/android/os/ICallback.aidl \
+ 	core/java/android/service/wallpaper/IWallpaperConnection.aidl \
+ 	core/java/android/service/wallpaper/IWallpaperEngine.aidl \
+ 	core/java/android/service/wallpaper/IWallpaperService.aidl \
+diff --git a/frameworks/base/core/java/android/os/ICallback.aidl b/frameworks/base/core/java/android/os/ICallback.aidl
+new file mode 100755
+index 0000000..40116a4
+--- /dev/null
++++ b/frameworks/base/core/java/android/os/ICallback.aidl
+@@ -0,0 +1,6 @@
++package android.os;
++
++interface ICallback
++{
++	void showResult(String result);  
++}
+diff --git a/frameworks/base/core/java/android/os/ILed_demo_service.aidl b/frameworks/base/core/java/android/os/ILed_demo_service.aidl
+index 633b6a8..48a30ef 100755
+--- a/frameworks/base/core/java/android/os/ILed_demo_service.aidl
++++ b/frameworks/base/core/java/android/os/ILed_demo_service.aidl
+@@ -1,7 +1,11 @@
+ package android.os;
++import android.os.ICallback;
+ 
+ interface ILed_demo_service
+ {
+     void led_set_ON(int val);
+     void led_set_OFF(int val);
++
++	void registerCallback(ICallback cb);  
++	void unregisterCallback(ICallback cb);
+ }
